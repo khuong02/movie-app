@@ -1,12 +1,16 @@
 import React from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import getYear from "../moment/getYear";
 
 const BannerDetail = (props) => {
+  const navigation = useNavigate();
   const { classes, detail, error } = props;
 
   const convertHours = (time) => {
@@ -46,12 +50,24 @@ const BannerDetail = (props) => {
       }}
     >
       <Box className={classes.containerContentDetail}>
-        <Box className={classes.posterDetail} style={{ zIndex: 3 }}>
+        <Box
+          data-aos="fade-in"
+          data-aos-duration="1000"
+          className={classes.posterDetail}
+          style={{ zIndex: 3, textAlign: "center" }}
+        >
           <CardMedia
             component="img"
             image={`${process.env.REACT_APP_API_URL_IMAGE}/w300/${detail.poster_path}`}
             alt={detail.original_title}
+            style={{ minWidth: "180px" }}
           />
+          <Button
+            sx={{ marginTop: "15px", minWidth: "150px" }}
+            variant="contained"
+          >
+            Play video
+          </Button>
         </Box>
         <Box className={classes.contentDetail}>
           <Box>
@@ -60,7 +76,7 @@ const BannerDetail = (props) => {
               <Typography
                 variant="span"
                 component="span"
-                style={{ marginLeft: "10px" }}
+                sx={{ display: "inline-block", marginLeft: "10px" }}
               >
                 ({getYear(detail.release_date)})
               </Typography>
@@ -77,10 +93,26 @@ const BannerDetail = (props) => {
             <Typography
               variant="p"
               component="p"
-              style={{ lineHeight: "25px" }}
+              className="text"
+              style={{
+                lineHeight: "25px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                LineClamp: 3,
+                WebkitBoxOrient: "vertical",
+              }}
             >
               {detail.overview}
             </Typography>
+            <Button
+              sx={{ marginTop: "10px" }}
+              onClick={() => navigation("/")}
+              variant="contained"
+            >
+              See more lists movie
+            </Button>
           </Box>
         </Box>
       </Box>

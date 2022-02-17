@@ -1,87 +1,128 @@
 import React, { useEffect, useState, useRef } from "react";
 
+import { useSelector } from "react-redux";
+
 import Box from "@mui/material/Box";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import SearchIcon from "@mui/icons-material/Search";
-import InputAdornment from "@mui/material/InputAdornment";
-import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import PullToRefresh from "react-simple-pull-to-refresh";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import productApi from "../../api/productApi";
 import LazyLoadImage from "../../components/lazyLoadImage/LazyLoadImage";
 import Loading from "../../layout/Loading";
+import MessageError from "../../components/listMovie/MessageError";
+import NavBar from "../navbar/NavBar";
 
 const ListMovie = () => {
+  const { searchData, err, loading } = useSelector(
+    (state) => state.searchSlice
+  );
+
+  const { link } = useSelector((state) => state.changeLinkSlice);
+
   const [listMovie, setListMovie] = useState();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState({
-    api_key: process.env.REACT_APP_API_KEY,
-    query: searchTerm,
-    page: 1,
-  });
-  const typingTimeoutRef = useRef(null);
+  const [index, setIndex] = useState(1);
+
   const currentListMovie = useRef(null);
 
   useEffect(() => {
     const getListMovie = async () => {
       try {
-        const params = {
-          api_key: process.env.REACT_APP_API_KEY,
-        };
-        const getListMovies = await productApi.getParams(`/list/1`, params);
-        // console.log(getListMovies);
-        setListMovie(getListMovies.data);
-        currentListMovie.current = getListMovies.data;
+        let params;
+        let configLink;
+
+        if (link === "/list") {
+          params = {
+            api_key: process.env.REACT_APP_API_KEY,
+          };
+          configLink = `${link}/1`;
+        } else {
+          params = {
+            api_key: process.env.REACT_APP_API_KEY,
+            page: 1,
+          };
+          configLink = link;
+        }
+
+        const getListMovies = await productApi.getParams(configLink, params);
+
+        if (getListMovies.status !== 200) {
+          setListMovie(getListMovies.data);
+          return;
+        }
+
+        if (getListMovies.data && getListMovies.data.results) {
+          setListMovie(getListMovies.data.results);
+          currentListMovie.current = getListMovies.data.results;
+          return;
+        }
+
+        setListMovie(getListMovies.data.items);
+        currentListMovie.current = getListMovies.data.items;
       } catch (err) {
         console.error(err);
       }
     };
 
     getListMovie();
-  }, []);
+  }, [link]);
 
   useEffect(() => {
-    if (filters.query.trim() === "") {
-      setListMovie(currentListMovie.current);
-    }
-    const searchMovieApi = async () => {
-      try {
-        const listsMovie = await productApi.getParams("/search/movie", filters);
-        setListMovie({ items: [...listsMovie.data.results] });
-      } catch (err) {
-        console.error(err);
-      }
-    };
+    if (!searchData) return;
+    setListMovie(searchData);
+  }, [searchData]);
 
-    searchMovieApi();
-  }, [filters]);
+  const fetchMoreData = async (e) => {
+    try {
+      let params;
+      let configLink;
+
+      if (link === "/list") {
+        params = {
+          api_key: process.env.REACT_APP_API_KEY,
+        };
+        configLink = `/list/${index + 1}`;
+      } else {
+        params = {
+          api_key: process.env.REACT_APP_API_KEY,
+          page: index + 1,
+        };
+        configLink = link;
+      }
+
+      const getListMovies = await productApi.getParams(configLink, params);
+      if (getListMovies.status !== 200) {
+        setListMovie(getListMovies.data);
+        return;
+      }
+
+      console.log(getListMovies);
+
+      if (getListMovies.data && getListMovies.data.results) {
+        setListMovie([
+          ...currentListMovie.current,
+          ...getListMovies.data.results,
+        ]);
+        currentListMovie.current = [
+          ...currentListMovie.current,
+          ...getListMovies.data.results,
+        ];
+        return;
+      }
+
+      setIndex(index + 1);
+      setListMovie([...currentListMovie.current, ...getListMovies.data.items]);
+      currentListMovie.current = [...listMovie, ...getListMovies.data.items];
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleRefresh = () => {
-    return new Promise.resolve(setTimeout(() => window.location.reload(), 300));
-  };
-
-  const handleChangeInput = (e) => {
-    const { value } = e.target;
-    setSearchTerm(value);
-
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    typingTimeoutRef.current = setTimeout(() => {
-      const newValue = {
-        value,
-      };
-
-      handleSearchMovie(newValue);
-    }, 300);
-  };
-
-  const handleSearchMovie = ({ value }) => {
-    setFilters({ ...filters, query: value, page: 1 });
+    return new Promise((resolve) =>
+      resolve(setTimeout(() => window.location.reload(), 300))
+    );
   };
 
   if (!listMovie) {
@@ -90,57 +131,58 @@ const ListMovie = () => {
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <Box style={{ width: "100vw" }}>
-        <Box style={{ textAlign: "center", marginBlock: "35px" }}>
-          <FormControl
-            sx={{ m: 1, width: "35ch", minWidth: "220px", maxWidth: "400px" }}
-            variant="outlined"
-          >
-            <InputLabel htmlFor="outlined-adornment-search">
-              Password
-            </InputLabel>
-            <OutlinedInput
-              id="outlined-adornment-search"
-              onChange={handleChangeInput}
-              value={searchTerm}
-              endAdornment={
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              }
-              label="Password"
-            />
-          </FormControl>
-        </Box>
+      <NavBar />
+      <Box
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          width: "100vw",
+          alignItems: "center",
+          marginTop: "130px",
+        }}
+      >
         <Box
           style={{
-            display: "flex",
-            flexWrap: "wrap",
-            maxWidth: "1200px",
-            minWidth: "400px",
             width: "80%",
-            margin: "auto",
+            display: "flex",
+            justifyContent: "center",
           }}
         >
-          <MessageError error={listMovie.data} />
-          {listMovie.items?.map((item) => {
-            return <LazyLoadImage image={item} key={item.id} />;
-          })}
+          <MessageError error={err} loading={loading} />
+          {!err && listMovie.length > 0 && !loading && (
+            <InfiniteScroll
+              dataLength={listMovie.length}
+              loader={
+                <Box
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
+                    overflow: "hidden",
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              }
+              hasMore={true}
+              next={fetchMoreData}
+              style={{
+                width: "100%",
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
+              {listMovie?.map((item) => {
+                return <LazyLoadImage image={item} key={item.id} />;
+              })}
+            </InfiniteScroll>
+          )}
         </Box>
       </Box>
     </PullToRefresh>
   );
-};
-
-const MessageError = ({ error }) => {
-  if (error) {
-    return (
-      <Typography variant="h3" component="h2" style={{ color: "tomato" }}>
-        {error.status_message}
-      </Typography>
-    );
-  }
-  return <></>;
 };
 
 export default ListMovie;

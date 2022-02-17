@@ -55,6 +55,8 @@ const ShowMember = (props) => {
                 .map((item, index) => {
                   return (
                     <Card
+                      data-aos="fade-in"
+                      data-aos-duration="1000"
                       key={item.id}
                       className={classes.cardMembers}
                       style={{

@@ -10,6 +10,7 @@ import { useStyle } from "../../style/useStyle";
 import BannerDetail from "../../components/detail/BannerDetail";
 import ShowMember from "../../components/detail/ShowMember";
 import Loading from "../../layout/Loading";
+import useWindowDimensions from "../../components/getScreen/useWindowDimensions";
 
 const DetailsMovie = () => {
   const { id } = useParams();
@@ -20,7 +21,8 @@ const DetailsMovie = () => {
   const [credits, setCredits] = useState();
   const [errorDetails, setErrorDetail] = useState();
   const [errorCredits, setErrorCredits] = useState();
-  const numOfItems = 6;
+  const { width } = useWindowDimensions();
+  const [numOfItems, setNumOfItems] = useState(6);
 
   useEffect(() => {
     const getDetailMovie = async () => {
@@ -52,6 +54,13 @@ const DetailsMovie = () => {
 
     getDetailMovie();
   }, [id]);
+
+  useEffect(() => {
+    if (width <= 650) setNumOfItems(2);
+    else if (width <= 900) setNumOfItems(3);
+    else if (width <= 1400) setNumOfItems(4);
+    else setNumOfItems(6);
+  }, [width]);
 
   if (!detail || !credits) {
     return <Loading />;

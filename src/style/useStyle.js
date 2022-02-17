@@ -13,6 +13,7 @@ export const useStyle = makeStyles((theme) => ({
     background:
       "linear-gradient(to bottom right, rgba(31.5, 31.5, 31.5, 1), rgba(31.5, 31.5, 31.5, 0.84))",
     // zIndex: 1,
+    // marginTop: "120px",
   },
   containerContentDetail: {
     display: "flex",
@@ -28,14 +29,14 @@ export const useStyle = makeStyles((theme) => ({
     cursor: "pointer",
   },
   contentDetail: {
-    flex: 3,
+    flex: 4,
     marginLeft: "30px",
     lineHeight: "40px",
   },
   bodyDetail: {
     maxWidth: "1400px",
     minWidth: "200px",
-    width: "auto",
+    // width: "200px",
     margin: "auto",
     marginBottom: "35px",
   },
@@ -47,6 +48,7 @@ export const useStyle = makeStyles((theme) => ({
     border: "1px #ddd solid",
     borderRadius: "8px",
     boxShadow: "none",
+    cursor: "pointer",
   },
   seeMoreDetail: {
     display: "inherit",
