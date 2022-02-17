@@ -19,6 +19,7 @@ const LazyLoad = ({ image }) => {
       effect="blur"
       height="500px"
       width="400px"
+      style={{ cursor: "pointer" }}
       onClick={handleClick}
     />
   );

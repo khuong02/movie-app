@@ -1,17 +1,22 @@
-import React from "react";
+import React, { Suspense } from "react";
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import ListMovie from "../views/movies/ListMovie";
-import DetailsMovie from "../views/movies/DetailsMovie";
+
+import Loading from "../layout/Loading";
+
+const ListMovie = React.lazy(() => import("../views/movies/ListMovie"));
+const DetailsMovie = React.lazy(() => import("../views/movies/DetailsMovie"));
 
 const IndexRouter = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<ListMovie />} />
-        <Route path="/detailsMovie/:id" element={<DetailsMovie />} />
-      </Routes>
-    </Router>
+    <Suspense fallback={<Loading />}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<ListMovie />} />
+          <Route path="/detailsMovie/:id" element={<DetailsMovie />} />
+        </Routes>
+      </Router>
+    </Suspense>
   );
 };
 
