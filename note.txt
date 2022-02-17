@@ -1,0 +1,3 @@
+--Because not time then I not yet add features. But I want to add features real-time to project: vote score to movie, comment, like,.... 
+Beside that, I want to add features: search debounce, filter movie, sort movie, assignment to project
+Thanks for this project. I had studied very much!
