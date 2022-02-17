@@ -16,15 +16,20 @@ const searchSlice = createSlice({
     searchSuccess: (state, action) => {
       state.loading = false;
       state.searchData = action.payload;
+      state.err = null;
     },
     searchFailed: (state, action) => {
       state.loading = false;
       state.err = action.payload;
     },
+    turnOffError: (state) => {
+      state.loading = false;
+      state.err = null;
+    },
   },
 });
 
-export const { searchPending, searchSuccess, searchFailed } =
+export const { searchPending, searchSuccess, searchFailed, turnOffError } =
   searchSlice.actions;
 
 export default searchSlice.reducer;

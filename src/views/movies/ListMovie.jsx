@@ -130,58 +130,60 @@ const ListMovie = () => {
   }
 
   return (
-    <PullToRefresh onRefresh={handleRefresh}>
+    <Box>
       <NavBar />
-      <Box
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          width: "100vw",
-          alignItems: "center",
-          marginTop: "130px",
-        }}
-      >
+      <PullToRefresh onRefresh={handleRefresh}>
         <Box
           style={{
-            width: "80%",
             display: "flex",
             justifyContent: "center",
+            width: "100vw",
+            alignItems: "center",
+            marginTop: "130px",
           }}
         >
-          <MessageError error={err} loading={loading} />
-          {!err && listMovie.length > 0 && !loading && (
-            <InfiniteScroll
-              dataLength={listMovie.length}
-              loader={
-                <Box
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: "100%",
-                    overflow: "hidden",
-                  }}
-                >
-                  <CircularProgress />
-                </Box>
-              }
-              hasMore={true}
-              next={fetchMoreData}
-              style={{
-                width: "100%",
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "center",
-              }}
-            >
-              {listMovie?.map((item) => {
-                return <LazyLoadImage image={item} key={item.id} />;
-              })}
-            </InfiniteScroll>
-          )}
+          <Box
+            style={{
+              width: "80%",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <MessageError error={err} loading={loading} />
+            {!err && listMovie.length > 0 && !loading && (
+              <InfiniteScroll
+                dataLength={listMovie.length}
+                loader={
+                  <Box
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "100%",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <CircularProgress />
+                  </Box>
+                }
+                hasMore={true}
+                next={fetchMoreData}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                }}
+              >
+                {listMovie?.map((item) => {
+                  return <LazyLoadImage image={item} key={item.id} />;
+                })}
+              </InfiniteScroll>
+            )}
+          </Box>
         </Box>
-      </Box>
-    </PullToRefresh>
+      </PullToRefresh>
+    </Box>
   );
 };
 

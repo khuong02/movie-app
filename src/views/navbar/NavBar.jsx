@@ -12,6 +12,7 @@ import {
   searchSuccess,
   searchPending,
   searchFailed,
+  turnOffError,
 } from "../../redux/slice/search/searchSlice";
 import { changeLink } from "../../redux/slice/changeLink/changeLinkSlice";
 
@@ -22,7 +23,6 @@ const NavBar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [check, setCheck] = useState(false);
   const [checkTopRated, setCheckTopRated] = useState(false);
-  //   const myRef = useRef(null);
 
   useEffect(() => {
     let link;
@@ -77,12 +77,14 @@ const NavBar = () => {
   const handleLinkNowPlaying = () => {
     setCheck(!check);
     setCheckTopRated(false);
+    dispatch(turnOffError());
     window.scrollTo(0, 0);
   };
 
   const handleLinkTopRated = () => {
     setCheckTopRated(!checkTopRated);
     setCheck(false);
+    dispatch(turnOffError());
     window.scrollTo(0, 0);
   };
 
